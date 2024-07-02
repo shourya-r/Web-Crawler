@@ -1,5 +1,5 @@
-import { crawlPage } from "./crawl.js";
-function main() {
+import { crawlPage, parseHTML } from "./crawl.js";
+async function main() {
   // process.argv returns an array with all the CLI arguments
   if (process.argv.length < 3) {
     console.log("No website provided");
@@ -11,7 +11,8 @@ function main() {
   }
   const baseURL = process.argv[2];
   console.log(`Starting crawl at ${baseURL}`);
-  crawlPage(baseURL);
+  const pages = await crawlPage(baseURL, baseURL, {});
+  console.log(pages);
 }
 
 main();

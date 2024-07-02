@@ -1,20 +1,52 @@
 import { JSDOM } from "jsdom";
 
-async function crawlPage(url) {
+async function crawlPage(currentURL, baseURL, pages) {
+  const currentURLObj = new URL(currentURL);
+  const baseURLObj = new URL(baseURL);
+  // We only want to crawl our own website
+  if (currentURLObj.hostname != baseURLObj.hostname) {
+    return pages;
+  }
+  const normalisedCurrentURL = normalizeURL(currentURL);
+  // if there are entries found for url then increment
+  if (pages[normalisedCurrentURL] > 0) {
+    pages[normalisedCurrentURL]++;
+    return pages;
+  } else {
+    pages[normalisedCurrentURL] = 1;
+  }
+  console.log(`Actively crawling: ${normalisedCurrentURL}`);
+
+  const htmlText = await parseHTML(currentURL);
+  if (htmlText != "") {
+    const nextURLs = getURLsFromHTML(htmlText, baseURL);
+    for (const nextURL of nextURLs) {
+      pages = await crawlPage(nextURL, baseURL, pages);
+    }
+  }
+  return pages;
+}
+
+async function parseHTML(url) {
   try {
     const resp = await fetch(url);
+    // if error status code
     if (resp.status > 399) {
       console.log(`Error occured : status code ${resp.status} on page ${url}`);
-      return;
+      return "";
     }
+    // if html not foind
     const contentType = resp.headers.get("content-type");
     if (!contentType.includes("text/html")) {
       console.log(`Error occured : HTML not returned at ${url}`);
-      return;
+      return "";
     }
-    console.log(await resp.text());
+    // else return html
+    const htmlBody = await resp.text();
+    return htmlBody;
   } catch (err) {
     console.log(`Error occured : ${err.message} at ${url}`);
+    return "";
   }
 }
 
@@ -54,4 +86,4 @@ function getURLsFromHTML(htmlbody, baseURL) {
   return links;
 }
 
-export { normalizeURL, getURLsFromHTML, crawlPage };
+export { normalizeURL, getURLsFromHTML, crawlPage, parseHTML };
