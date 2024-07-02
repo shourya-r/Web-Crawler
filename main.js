@@ -1,4 +1,5 @@
 import { crawlPage, parseHTML } from "./crawl.js";
+import { printReport } from "./report.js";
 async function main() {
   // process.argv returns an array with all the CLI arguments
   if (process.argv.length < 3) {
@@ -12,7 +13,7 @@ async function main() {
   const baseURL = process.argv[2];
   console.log(`Starting crawl at ${baseURL}`);
   const pages = await crawlPage(baseURL, baseURL, {});
-  console.log(pages);
+  printReport(pages);
 }
 
 main();
