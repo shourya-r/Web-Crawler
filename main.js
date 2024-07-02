@@ -1,3 +1,4 @@
+import { crawlPage } from "./crawl.js";
 function main() {
   // process.argv returns an array with all the CLI arguments
   if (process.argv.length < 3) {
@@ -10,6 +11,7 @@ function main() {
   }
   const baseURL = process.argv[2];
   console.log(`Starting crawl at ${baseURL}`);
+  crawlPage(baseURL);
 }
 
 main();

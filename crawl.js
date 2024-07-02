@@ -1,5 +1,23 @@
 import { JSDOM } from "jsdom";
 
+async function crawlPage(url) {
+  try {
+    const resp = await fetch(url);
+    if (resp.status > 399) {
+      console.log(`Error occured : status code ${resp.status} on page ${url}`);
+      return;
+    }
+    const contentType = resp.headers.get("content-type");
+    if (!contentType.includes("text/html")) {
+      console.log(`Error occured : HTML not returned at ${url}`);
+      return;
+    }
+    console.log(await resp.text());
+  } catch (err) {
+    console.log(`Error occured : ${err.message} at ${url}`);
+  }
+}
+
 function normalizeURL(urlstring) {
   const urlObj = new URL(urlstring);
   const host = urlObj.hostname;
@@ -36,4 +54,4 @@ function getURLsFromHTML(htmlbody, baseURL) {
   return links;
 }
 
-export { normalizeURL, getURLsFromHTML };
+export { normalizeURL, getURLsFromHTML, crawlPage };
